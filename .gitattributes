@@ -1,0 +1,3 @@
+# Distributed as an agent skill: line endings must be LF everywhere.
+# CRLF in a shell/Node payload breaks on POSIX checkouts (see references/10-pitfalls.md #4).
+* text=auto eol=lf

@@ -1,0 +1,7 @@
+# Gate reports written while testing the skill against a scratch repo
+.prd-gate/
+# Skill installers
+skills-lock.json
+node_modules/
+.DS_Store
+Thumbs.db
