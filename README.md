@@ -122,3 +122,7 @@ rules. They pass on Windows and POSIX (the metric fixtures are Node, not shell).
 - The skill was extracted from a real multi-phase project (audit → spec → PRD → seven-phase plan →
   waves executed by parallel sub-agents). The templates are the generalised versions of what worked
   there.
+
+## Licence
+
+MIT — see [LICENSE](LICENSE).
