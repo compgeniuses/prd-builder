@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "project": "{{PROJECT}}",
+  "generated_from": "docs/prd (planning session {{DATE}})",
+  "requirements": [],
+  "findings": [],
+  "phases": [
+    {
+      "id": "P0",
+      "name": "First phase",
+      "depends_on": [],
+      "start_after": null,
+      "lanes": { "A": "First lane", "Q": "Quality follow-ups", "Z": "Wave integration" },
+      "waves": { "P0-W1": "Foundations" },
+      "exit_criteria": ["<command → expected output>"],
+      "exit_results": [],
+      "completed_at": null
+    }
+  ],
+  "tasks": [
+    {
+      "id": "P0-A01",
+      "phase": "P0",
+      "wave": "P0-W1",
+      "lane": "A",
+      "title": "<imperative title: what changes and where>",
+      "size": "M",
+      "depends_on": [],
+      "files": ["src/<file owned by this task>"],
+      "acceptance": ["<checkable criterion with its evidence source, e.g. probe C01 PASS>"],
+      "test": "<the failing test to write first>",
+      "reqs": ["FR-01"],
+      "findings": [],
+      "spec": "specs/<product>/README.md",
+      "deps_install": false,
+      "status": "todo",
+      "commit": null,
+      "notes": "",
+      "completed_at": null
+    }
+  ]
+}

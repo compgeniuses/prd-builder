@@ -1,0 +1,29 @@
+{
+  "project": "{{PROJECT}}",
+  "integrationBranch": "{{BRANCH}}",
+  "prdDir": "docs/prd",
+  "ledger": "docs/prd/tasks.json",
+  "requirementsSource": "docs/prd/README.md",
+  "findingsSource": null,
+  "gateCommand": "node scripts/prd/gate.mjs",
+  "installCommand": null,
+  "trailers": [],
+  "modelPolicy": "docs/prd/workflow-log/decisions/README.md#model-policy",
+  "gate": {
+    "_comment": "Adapt the commands to the stack. metric = number compared to gate-baseline.json (ratchet); command = must exit 0; tdd = source changes need test changes; forbidden = regexes that must not appear in added lines. Placeholders: {changed} {changedTests} {changedSources} {base} {task}. scope: task | phase | both.",
+    "baselineFile": "scripts/prd/gate-baseline.json",
+    "reportDir": ".prd-gate",
+    "sourcePattern": "^(src|lib|app)/.*\\.(ts|tsx|js|jsx|mjs|cjs|py|go|rs)$",
+    "testPattern": "(^|/)(__tests__|tests?|spec)/|\\.(test|spec)\\.[a-z]+$|_test\\.(go|py)$",
+    "checks": [
+      { "id": "G1", "name": "Typecheck errors do not increase", "type": "metric", "key": "typecheckErrors", "command": "npx tsc --noEmit --pretty false", "count": "error TS\\d+", "allowFail": true },
+      { "id": "G3", "name": "Related tests pass", "type": "command", "scope": "task", "command": "npx vitest related --run {changed}", "files": "\\.(ts|tsx|js|jsx)$", "summary": "Tests\\s+.*" },
+      { "id": "G4", "name": "Source changes include tests (TDD)", "type": "tdd" },
+      { "id": "G5", "name": "No encoding damage added", "type": "forbidden", "patterns": ["\\u00c3[\\u0080-\\u00bf]", "\\u00e2\\u20ac", "\\u00c2\\u00a0"] },
+      { "id": "G6", "name": "No forbidden patterns added", "type": "forbidden", "files": "^src/", "patterns": ["as any as", "\\balert\\(", "\\bconfirm\\(", "debugger;"] },
+      { "id": "G7", "name": "Lint on changed files", "type": "command", "scope": "task", "command": "npx eslint {changed}", "files": "\\.(ts|tsx|js|jsx|mjs|cjs)$" },
+      { "id": "P1", "name": "Full test suite", "type": "command", "scope": "phase", "command": "npx vitest run", "summary": "Test Files\\s+.*" },
+      { "id": "P2", "name": "Production build", "type": "command", "scope": "phase", "command": "npm run build" }
+    ]
+  }
+}
