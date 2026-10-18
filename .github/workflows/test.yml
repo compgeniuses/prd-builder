@@ -1,0 +1,50 @@
+# ABOUTME: Runs the skill's end-to-end tests on Linux and Windows so the claim in
+# ABOUTME: README.md ("11 tests, nothing but Node >= 18 and git") stays checkable.
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      # What an installer reads before anything else. If this breaks, the skill
+      # stops being installable and nothing else in the repo matters.
+      - name: Validate SKILL.md frontmatter
+        run: |
+          node -e "
+            const fs = require('fs');
+            const src = fs.readFileSync('prd-builder/SKILL.md', 'utf8');
+            const m = src.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+            if (!m) { console.error('no YAML frontmatter block'); process.exit(1); }
+            const fm = m[1];
+            const name = (fm.match(/^name:\s*(.+)$/m) || [])[1];
+            const desc = (fm.match(/^description:\s*([\s\S]*?)(?=\r?\n[a-zA-Z_-]+:|$)/m) || [])[1];
+            if (name !== 'prd-builder') { console.error('name is ' + JSON.stringify(name) + ', expected prd-builder'); process.exit(1); }
+            if (!desc || !desc.trim()) { console.error('description is empty'); process.exit(1); }
+            if (desc.trim().length > 1024) { console.error('description is ' + desc.trim().length + ' chars, over the 1024 limit'); process.exit(1); }
+            console.log('frontmatter ok: name=' + name + ', description=' + desc.trim().length + ' chars');
+          "
+
+      - name: Run end-to-end tests
+        run: node --test prd-builder/scripts/test/prd-tools.test.mjs
